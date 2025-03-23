@@ -50,7 +50,6 @@ let measurementsQuery=()=>{
   const values = measurements.map(item => [item.id, item.size, item.volume]);
 
   execute(query, values);
-  console.log("checked!!")
 }
 
 let ingredientsQuery=()=>{
@@ -59,7 +58,6 @@ let ingredientsQuery=()=>{
   const query = 'INSERT INTO ingredients (id, name, density) VALUES ?'; 
   const values = ingredients.map(item => [item.id, item.name, item.density])
   execute(query, values);
-  console.log("checked!!")
 }
 
 let execute=(query,values)=>{
