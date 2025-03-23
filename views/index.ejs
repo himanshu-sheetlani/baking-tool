@@ -23,13 +23,23 @@
         </div>
         <p id="weight" class="text-center mt-5"></p>
         
-        <div class="flex justify-center mb-5">
-            <div class="flex">
-                <input type="text" id="chatInput" class="border p-2 mr-2" placeholder="Type your message here...">
-                <button id="sendChat" class="bg-blue-500 text-white p-2">Send</button>
+        <div class="border p-4 rounded-lg shadow-lg mb-5">
+
+            <div class="flex justify-center mb-3">
+                <div class="flex">
+                    <input type="text" id="chatInput" class="border p-2 mr-2" placeholder="Type your message here...">
+                    <button id="sendChat" class="bg-blue-500 text-white p-2">Send</button>
+                </div>
+            </div>
+            <div id="chatHistory" class="mt-5 text-center">
+                <b>Chatbot:</b> Hi there! How can I help you with your baking today?
+            </div>
+            <div id="loadingIndicator" class="hidden text-center mt-2">
+                <p>Loading...</p>
+                <div class="loader"></div> <!-- loader -->
             </div>
         </div>
-        <div id="chatHistory" class="mt-5 text-center"></div>
+
         <div id="chatResponse" class="mt-5 text-center"></div>
 
     </div>
@@ -77,7 +87,7 @@
                 let density = await axios.post('/api/convertIngredient', { ingredient});
                 let volume= quantity* vol.data.vol;
                 let weight = volume*density.data.density;
-                document.getElementById('weight').innerText = `Weight: ${weight} grams`;
+                document.getElementById('weight').innerText = `Weight: ${(Math.round(weight*100)/100)} grams`;
             } catch (error) {
                 document.getElementById('weight').innerText = 'Error: Ingredient or size not found';
             }
@@ -87,14 +97,21 @@
         fetchMeasurements();
 
         document.getElementById('sendChat').addEventListener('click', async () => {
+            const chatHistory = document.getElementById('chatHistory');
             const message = document.getElementById('chatInput').value;
+            chatHistory.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+            document.getElementById('chatInput').value = "";
+            
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+
             try {
                 const response = await axios.post('/api/chatbot', { message });
-                const chatHistory = document.getElementById('chatHistory');
-                chatHistory.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
-                chatHistory.innerHTML += `<p><strong>Chatbot:</strong> ${response.data}</p>`; // Display the chatbot's response
+                chatHistory.innerHTML += `<p><strong>Chatbot:</strong> ${response.data}</p>`;
             } catch (error) {
                 document.getElementById('chatResponse').innerText = 'Error: Unable to get response from chatbot';
+            } finally {
+
+                document.getElementById('loadingIndicator').classList.add('hidden');
             }
         });
 

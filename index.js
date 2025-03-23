@@ -11,7 +11,7 @@ const key =process.env.API_Key
 const genAI = new GoogleGenerativeAI(key);
 const model = genAI.getGenerativeModel({
     model: "gemini-2.0-flash",
-    systemInstruction: "You are an expert baker who helps other bakers by answering their questions and converting measurements like cups or spoons into grams. Keep responses clear, concise, and easy to follow. Do not use markdown syntax; instead, use <b> HTML syntax for bold text."
+    systemInstruction: "You are an expert baker who helps other bakers by answering their questions and converting measurements like cups or spoons into grams. Keep responses clear, concise, and easy to follow. Do not use markdown syntax like *; instead, use <b> HTML syntax for bold text <br> for new line; and dont reply anything other than baking be like professional chatbot."
   });
 
 const methodoverride = require("method-override");
@@ -31,11 +31,7 @@ app.get('/', (req, res) => {
 
 app.post('/api/chatbot', async (req, res) => {
 
-    const userMessage = req.body.message; // Assuming the user sends a message in the request body
-    // Here you would call the Gemini API with the userMessage
-    // For example:
-    // const response = await callGeminiAPI(userMessage);
-    // res.json(response);
+    const userMessage = req.body.message;
     
     const response = await callGeminiAPI(userMessage);
     res.json(response);

@@ -1,11 +1,4 @@
-const mysql =require("mysql2")
-
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '1234',
-    database: 'solution_challenge'
-});
+const connection = require("./db")
 
 const ingredients = [
   { id: 1, name: "All-Purpose Flour", density: 0.57 },
@@ -45,24 +38,45 @@ const measurements = [
   { id: 8, size: "cup", volume: 236.59 }
 ];
 
-// const query = 'INSERT INTO ingredients (id, name, density) VALUES ?';
-const query = 'INSERT INTO measurements (id, size, volume) VALUES ?';
 
-const values = measurements.map(item => [item.id, item.size, item.volume])
+
 
 // console.log(values);
 
+let measurementsQuery=()=>{
+  execute("CREATE TABLE IF NOT EXIT measurements", []);
 
-try {
-  connection.query(query, [values], (err, results) => {
+  const query = 'INSERT INTO measurements (id, size, volume) VALUES ?';
+  const values = measurements.map(item => [item.id, item.size, item.volume]);
 
-    if (err) {
-      console.log(err);
-      return;
-    }
-    console.log(results);
-  });
-} 
-catch (err) {
-  console.log(err);
+  execute(query, values);
+  console.log("checked!!")
 }
+
+let ingredientsQuery=()=>{
+  execute("CREATE TABLE IF NOT EXIT ingredients", []);
+
+  const query = 'INSERT INTO ingredients (id, name, density) VALUES ?'; 
+  const values = ingredients.map(item => [item.id, item.name, item.density])
+  execute(query, values);
+  console.log("checked!!")
+}
+
+let execute=(query,values)=>{
+  try {
+    connection.query(query, [values], (err, results) => {
+
+      if (err) {
+        console.log(err);
+        return;
+      }
+      console.log(results);
+    });
+  } 
+  catch (err) {
+    console.log(err);
+  }
+}
+
+measurementsQuery();
+ingredientsQuery();
