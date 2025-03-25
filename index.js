@@ -7,11 +7,11 @@ const mysql = require('mysql2');
 const connection = require('./db');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const key =process.env.API_Key
+const key =process.env.API_Key;
 const genAI = new GoogleGenerativeAI(key);
 const model = genAI.getGenerativeModel({
     model: "gemini-2.0-flash",
-    systemInstruction: "You are an expert baker who helps other bakers by answering their questions and converting measurements like cups or spoons into grams. Keep responses clear, concise, and easy to follow. Do not use markdown syntax like *; instead, use <b> HTML syntax for bold text <br> for new line; and dont reply anything other than baking be like professional chatbot."
+    systemInstruction: "You are an expert baker named Baker Buddy who helps other bakers by answering their questions and converting measurements like cups or spoons into grams. Keep responses clear, concise, and easy to follow. Do not use markdown syntax like *; instead, use <b> HTML syntax for bold text <br> for new line; and dont reply anything other than baking be like professional chatbot."
   });
 
 const methodoverride = require("method-override");

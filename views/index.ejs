@@ -22,29 +22,57 @@
             <button id="convert" class="bg-blue-500 text-white p-2 ml-2">Convert</button>
         </div>
         <p id="weight" class="text-center mt-5"></p>
-        
-        <div class="border p-4 rounded-lg shadow-lg mb-5">
 
-            <div class="flex justify-center mb-3">
-                <div class="flex">
-                    <input type="text" id="chatInput" class="border p-2 mr-2" placeholder="Type your message here...">
-                    <button id="sendChat" class="bg-blue-500 text-white p-2">Send</button>
+        <div class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" id="overlay">
+            <div class="border p-4 rounded-lg shadow-lg mb-5 hidden bg-white flex flex-col justify-between" id="chatContainer" style="z-index: 100; height: 600px; width: 500px; margin: auto;">
+                <div id="chatHistory" class="mt-5 text-left overflow-y-auto" style="max-height: 300px;">
+
+                    <div class="p-3 bg-green-100 rounded-lg">
+                        <p> <strong>Baker Buddy:</strong> Hello! Baker Buddy at your service! How can I help you with your baking today? </p>
+                    </div>
                 </div>
-            </div>
-            <div id="chatHistory" class="mt-5 text-center">
-                <b>Chatbot:</b> Hi there! How can I help you with your baking today?
-            </div>
-            <div id="loadingIndicator" class="hidden text-center mt-2">
-                <p>Loading...</p>
-                <div class="loader"></div> <!-- loader -->
+                <div id="loadingIndicator" class="hidden">
+                    <div class="loader"></div>
+                    <style>
+                        .loader {
+                        width: 40px;
+                        aspect-ratio: 2;
+                        --_g: no-repeat radial-gradient(circle closest-side,#000 90%,#0000);
+                        background: 
+                            var(--_g) 0%   50%,
+                            var(--_g) 50%  50%,
+                            var(--_g) 100% 50%;
+                        background-size: calc(100%/3) 50%;
+                        animation: l3 1s infinite linear;
+                        }
+                        @keyframes l3 {
+                            20%{background-position:0%   0%, 50%  50%,100%  50%}
+                            40%{background-position:0% 100%, 50%   0%,100%  50%}
+                            60%{background-position:0%  50%, 50% 100%,100%   0%}
+                            80%{background-position:0%  50%, 50%  50%,100% 100%}
+                        }
+                    </style>
+                </div>
+                <div id="chatResponse" class="color-red"></div>
+                <div class="flex flex-col items-start ">
+                    <input type="text" id="chatInput" class="border p-2 mr-2 w-full m-2" placeholder="Type your message here...">
+                    <button id="sendChat" class="bg-blue-500 text-white p-2 w-full m-2">Send</button>
+                </div>
             </div>
         </div>
 
-        <div id="chatResponse" class="mt-5 text-center"></div>
-
+        <button id="chatToggle" class="fixed bottom-5 right-5 bg-blue-500 text-white p-3 rounded-full z-50">Chat</button>
     </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
+        document.getElementById('chatToggle').addEventListener('click', () => {
+            const chatContainer = document.getElementById('chatContainer');
+            const overlay = document.getElementById('overlay');
+            chatContainer.classList.toggle('hidden');
+            overlay.classList.toggle('hidden');
+        });
+
         const fetchIngredients = async () => {
             try {
                 const response = await axios.get('/api/ingredients');
@@ -77,6 +105,32 @@
             }
         };
 
+        const sendMessage = async () => {
+            const chatHistory = document.getElementById('chatHistory');
+            const message = document.getElementById('chatInput').value;
+            chatHistory.innerHTML += `<div class="p-3 bg-blue-100 rounded-lg m-2" <p style="text-align:right"><strong>You:</strong> ${message}</p> </div>`;
+            document.getElementById('chatInput').value = "";
+            
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+
+            try {
+                const response = await axios.post('/api/chatbot', { message });
+                chatHistory.innerHTML += `<div class="p-3 bg-green-100 rounded-lg m-2" <p style="text-align:left"><strong>Baker Buddy:</strong> ${response.data}</p> </div>`;
+            } catch (error) {
+                alert(error);
+            } finally {
+                document.getElementById('loadingIndicator').classList.add('hidden');
+            }
+        };
+
+        document.getElementById('sendChat').addEventListener('click', sendMessage);
+
+        document.getElementById('chatInput').addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
         document.getElementById('convert').addEventListener('click', async () => {
             const ingredient = document.getElementById('ingredient').value;
             const size = document.getElementById('size').value;
@@ -94,26 +148,6 @@
 
         fetchIngredients();
         fetchMeasurements();
-
-        document.getElementById('sendChat').addEventListener('click', async () => {
-            const chatHistory = document.getElementById('chatHistory');
-            const message = document.getElementById('chatInput').value;
-            chatHistory.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
-            document.getElementById('chatInput').value = "";
-            
-            document.getElementById('loadingIndicator').classList.remove('hidden');
-
-            try {
-                const response = await axios.post('/api/chatbot', { message });
-                chatHistory.innerHTML += `<p><strong>Chatbot:</strong> ${response.data}</p>`;
-            } catch (error) {
-                document.getElementById('chatResponse').innerText = 'Error: Unable to get response from chatbot';
-            } finally {
-
-                document.getElementById('loadingIndicator').classList.add('hidden');
-            }
-        });
-
     </script>
 </body>
 </html>
