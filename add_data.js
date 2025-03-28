@@ -44,7 +44,7 @@ const measurements = [
 // console.log(values);
 
 let measurementsQuery=()=>{
-  execute("CREATE TABLE measurements (id int unique, size varchar(50) not null, volume varchar not null)", []);
+  execute("CREATE TABLE measurements (id int unique, size varchar(50) not null, volume float not null)", []);
 
   const query = 'INSERT INTO measurements (id, size, volume) VALUES ?';
   const values = measurements.map(item => [item.id, item.size, item.volume]);
@@ -53,7 +53,7 @@ let measurementsQuery=()=>{
 }
 
 let ingredientsQuery=()=>{
-  execute("CREATE TABLE ingredients (id int unique, name varchar(100) not null, density varchar not null)", []);
+  execute("CREATE TABLE ingredients (id int unique, name varchar(100) not null, density float not null)", []);
 
   const query = 'INSERT INTO ingredients (id, name, density) VALUES ?'; 
   const values = ingredients.map(item => [item.id, item.name, item.density])
